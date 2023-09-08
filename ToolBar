@@ -1,0 +1,133 @@
+
+// manifest.json (Chrome Extension)
+{
+  "manifest_version": 2,
+  "name": "WebWarn",
+  "version": "1.1", // Updated version
+  "description": "Protects against malicious websites",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "webNavigation"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "manifest_version": 2,
+  // Add localized versions if necessary
+  "default_locale": "en",
+  // Add support for Firefox and Edge if needed
+  "applications": {
+    "gecko": {
+      "id": "your-extension-id@webwarn.com",
+      "strict_min_version": "66.0"
+    },
+    "chrome": {
+      "id": "your-extension-id",
+      "update_url": "https://your-extension-update-server.com/update.xml"
+    }
+  },
+  // Add content_security_policy for improved security
+  "content_security_policy": "script-src 'self' https://ajax.googleapis.com https://cdn.jsdelivr.net; object-src 'self'",
+  // Add permissions for storage and webNavigation
+  "permissions": [
+    "storage",
+    "webNavigation"
+  ]
+}
+
+// popup.html (HTML for the browser extension popup)
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebWarn</title>
+  <script src="popup.js"></script>
+</head>
+<body>
+  <h1>Welcome to WebWarn</h1>
+  <button id="checkWebsite">Check Website</button>
+  <!-- Include a link to user guides and tutorials -->
+  <a href="https://your-website.com/user-guides" target="_blank">User Guides</a>
+  <!-- Include a feedback button or form -->
+  <button id="feedbackButton">Provide Feedback</button>
+</body>
+</html>
+
+// popup.js (JavaScript for the popup)
+document.getElementById('checkWebsite').addEventListener('click', function() {
+  // Implement code to check the current website for threats
+  // You can display a message or take appropriate action based on the results
+});
+
+document.getElementById('feedbackButton').addEventListener('click', function() {
+  // Open a new tab or window with the feedback form
+  chrome.tabs.create({ url: 'https://your-website.com/feedback-form' });
+});
+
+// Function to check if the website URL contains typosquatting patterns
+function containsTyposquattingPatterns(websiteUrl) {
+  // List of common typosquatting patterns for less tech-savvy users
+  const commonPatterns = [
+    // Replace common letters with visually similar characters
+    { pattern: '0', replacement: 'o' }, // Zero (0) for 'o'
+    { pattern: '1', replacement: 'l' }, // One (1) for 'l'
+    { pattern: '3', replacement: 'e' }, // Three (3) for 'e'
+    { pattern: '4', replacement: 'a' }, // Four (4) for 'a'
+    { pattern: '5', replacement: 's' }, // Five (5) for 's'
+    { pattern: '7', replacement: 't' }, // Seven (7) for 't',
+    
+    // Common typos or omitted letters
+    { pattern: 'ww', replacement: 'www' }, // Missing 'w's in 'www'
+    { pattern: 'htt', replacement: 'http' }, // Missing 'p' in 'http'
+    
+    // Common misspellings
+    { pattern: 'gogle', replacement: 'google' },
+    { pattern: 'facbook', replacement: 'facebook' },
+    { pattern: 'twiter', replacement: 'twitter' },
+    // Add more patterns as needed
+    
+    // Common domain variations
+    { pattern: 'com.', replacement: 'com' }, // Remove trailing dot
+    { pattern: '.com', replacement: 'com' }, // Remove leading dot
+  ];
+
+  // Convert the URL to lowercase for case-insensitive comparison
+  const lowercaseUrl = websiteUrl.toLowerCase();
+
+  // Check if the URL contains any of the common typosquatting patterns
+  for (const { pattern, replacement } of commonPatterns) {
+    if (lowercaseUrl.includes(pattern)) {
+      // Replace the pattern with the correct version for user-friendly feedback
+      const friendlyUrl = lowercaseUrl.replace(pattern, replacement);
+
+      // Return the friendly URL as a potential typosquatting match
+      return friendlyUrl;
+    }
+  }
+
+  // If no typosquatting patterns are detected, return false
+  return false;
+}
